@@ -1,0 +1,1 @@
+# SOCI502_notes

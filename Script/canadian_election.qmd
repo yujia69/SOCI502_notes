@@ -1,0 +1,66 @@
+---
+title: "Canadian Election"
+author: "Yujia Huang"
+format: html
+editor: visual
+---
+
+## 1. Plan
+
+-   Dataset: Each observation should include the riding name and the party of the elected candidate.
+
+-   Graph: The graph should show the number of ridings won by each party.
+
+## 2. Simulate
+
+-   Create a Quarto document.
+
+-   Load necessary packages: `tidyverse`, and `janitor`.
+
+    ```{r}
+    #### Workspace setup ####
+    #install.packages("tidyverse")
+    #install.packages("janitor")
+
+    library(tidyverse)
+    library(janitor)
+    ```
+
+-   Simulate election results by randomly assigning parties to ridings: Add numbers for the riding, then use `sample()` to randomly choose one of six options, with replacement, 338 times.
+
+    ```{r}
+    simulated_data <-
+      tibble(
+        # Use 1 through to 338 to represent each riding
+        "Riding" = 1:338,
+        # Randomly pick an option, with replacement, 151 times
+        "Party" = sample(
+          x = c("Liberal", "Conservative", "Bloc Québécois", "New Democratic", "Green" ,"Other"),
+          size = 338,
+          replace = TRUE
+        )
+      )
+
+    simulated_data
+    ```
+
+## 3. Acquire
+
+-   Download the CSV file from Elections Canada [hereLinks to an external site.](https://www.elections.ca/res/rep/off/ovr2021app/53/data_donnees/table_tableau11.csv).
+
+-   Clean the names, and then select the two columns that are of interest: “electoral_district_name_nom_de_circonscription”, and “elected_candidate_candidat_elu”. Finally, rename the columns to remove the French and simplify the names.
+
+-   The column that we need is about the elected candidates. That has the surname of the elected candidate, followed by a comma, followed by their first name, followed by a space, followed by the name of the party in both English and French, separated by a slash. Break-up this column into its pieces using `separate()` from `tidyr` and then use `select()` to just keep party information (some helper code is below).
+
+-   Finally, recode the party names from French to English to match what we simulated.
+
+```{r}
+1 + 1
+```
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
