@@ -22,9 +22,6 @@ This repo includes Yujia's SOCI 502 assignment
 │
 ├── README.md
 │
-├── SOCI502-Data_Story/
-│   └── README.md
-│
 └── Script/
     ├── Script.Rproj
     ├── australian_elections.html
