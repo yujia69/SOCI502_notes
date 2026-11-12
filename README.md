@@ -1,7 +1,10 @@
 # SOCI502
 This repo includes Yujia's SOCI 502 assignment
 
-## Notes for Dr. Laura: The 11-3 assignment is in the Data story folder since it used the same data
+#### Notes for Dr. Laura: The 11-3 assignment is in the Data story folder since it used the same data
+
+##### Project Structure
+.
 ├── Data_story
 │   ├── 10-27-practice_read_data.qmd
 │   ├── 11-3-practice_EDA.qmd
