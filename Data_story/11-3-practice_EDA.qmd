@@ -1,0 +1,109 @@
+---
+title: "11-3-practice_EDA"
+format: pdf
+---
+
+## This document contains preliminary EDA for data story on French scoail movement's involment of women participants.
+
+
+```{r}
+library(tidyverse)
+library(tidyverse)
+
+data_raw <- read.csv(
+  "data/db_hiscod_csv_v1_en.csv",
+  sep = ";",
+  header = TRUE
+)
+
+```
+### Make a copy of the data
+```{r}
+data_copy <- data_raw |>
+  separate_wider_delim(
+    cols = 1,
+    delim = ";",
+    names = strsplit(names(data_raw)[1], ";")[[1]]
+  )
+```
+
+### Take a look of the data
+```{r}
+head(data_copy)
+tail(data_copy)
+slice(data_copy)
+glimpse(data_copy)
+colnames(data_copy)
+```
+
+### The column I am interested in are id, year, contry_name, women_participation. So I am slecting the three column to check the dataset. 
+```{r}
+data_select <- 
+data_copy |> 
+  select(id, country_name, year, women_participation)
+```
+
+### For contry, I only want to include France; for year i want to range from 1700 to 1900
+```{r}
+france_data <-data_select |>
+    filter(
+    country_name == "France",
+    year >= 1700,
+    year <= 1900
+  )
+head(france_data)
+```
+
+### Take a look of the fittlered data
+```{r}
+head(france_data)
+tail(france_data)
+slice(france_data)
+glimpse(france_data)
+colnames(france_data)
+```
+
+### Check the distribution of the variable 
+###women's participation
+```{r}
+library(ggplot2)
+
+ggplot(france_data, aes(x = women_participation)) +
+  geom_bar() +
+  labs(
+    title = "Distribution of the variables Women's Participation in French Social Conflicts",
+    x = "Women's participation",
+    y = "Number of events"
+  ) +
+  theme_minimal()
+```
+
+###year
+```{r}
+library(ggplot2)
+
+ggplot(france_data, aes(x = year)) +
+  geom_bar() +
+  labs(
+    title = "Distribution of the variables Year",
+    x = "Year",
+    y = "Number of events"
+  ) +
+  theme_minimal()
+```
+
+## Summarize the dataset by year
+```{r}
+yearly_summary <- france_data |>
+  group_by(year) |>
+  summarise(
+    total_conflicts = n(),
+    women_yes = sum(women_participation == "Yes", na.rm = TRUE),
+    women_no = sum(women_participation == "No", na.rm = TRUE),
+    women_unknown = sum(women_participation == "Unknown", na.rm = TRUE),
+    percentage_women = (women_yes / total_conflicts) * 100
+  )
+
+yearly_summary
+```
+

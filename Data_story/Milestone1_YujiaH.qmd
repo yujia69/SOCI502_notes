@@ -1,0 +1,49 @@
+---
+title: "Women's participation in social conflict in France in 18th to 19th centuries"
+format: html
+author: Yujia Huang
+---
+
+## Research Question
+How did the percentage of social conflicts involving women in France change between the 18th and 19th centuries?
+
+## Dataset
+To answer the question, I will apply the Historical Social Conflict Database (HiSCoD), which contains information about social conflict from the late Middle Ages to the 19th century (Chambru & Maneuvrier-Hervieu, 2022). The database documents events' name, date, Characteristics, including conflict classification, women participants, etc. 
+
+## Simulation of data
+To answer this question, I will need three variables: Event ID, Year, and Women’s Participation. Each row will represent a unique event identified by an Event ID. The Year variable will contain values ranging from 1700 to 1900, and Women’s Participation will be a binary variable indicating whether women participated in the event (1 = Yes, 0 = No).
+```{r}
+#### Workspace setup ####
+# install.packages("tidyverse")
+# install.packages("janitor")
+
+library(tidyverse)
+library(janitor)
+```
+
+```{r}
+# Set seed for reproducibility
+set.seed(123)
+
+# Simulate 500 rows of data
+social_conflict <- tibble(
+  "Event_ID" = 1:500,
+  "Year" = sample(1700:1900, size = 500, replace = TRUE),
+  "Women_Participation" = sample(
+    c(0, 1),
+    size = 500,
+    replace = TRUE,
+    prob = c(0.7, 0.3)
+  )
+)
+
+# View the first 6 rows
+head(social_conflict)
+```
+
+
+
+## Potential Pattern as an Answer
+There is an increase in proportion of social conflicts involving women in France between the 18th and 19th centuries on average.
+
+

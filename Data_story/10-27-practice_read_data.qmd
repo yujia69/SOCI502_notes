@@ -1,0 +1,86 @@
+---
+title: "10-27-practice-read-data"
+format: pdf
+---
+
+## This document is to practice reading data in R
+
+```{r}
+library(tidyverse)
+library(tidyverse)
+
+data_raw <- read.csv(
+  "data/db_hiscod_csv_v1_en.csv",
+  sep = ";",
+  header = TRUE
+)
+
+```
+### Make a copy of the data
+```{r}
+data_copy <- data_raw |>
+  separate_wider_delim(
+    cols = 1,
+    delim = ";",
+    names = strsplit(names(data_raw)[1], ";")[[1]]
+  )
+```
+
+### Take a look of the data
+```{r}
+head(data_copy)
+colnames(data_copy)
+```
+### The column I am interested in are id, year, contry_name, women_participation. So I am slecting the three column to check the dataset. 
+```{r}
+data_select <- 
+data_copy |> 
+  select(id, country_name, year, women_participation)
+```
+
+### For contry, I only want to include France; for year i want to range from 1700 to 1900
+```{r}
+france_data <-data_select |>
+    filter(
+    country_name == "France",
+    year >= 1700,
+    year <= 1900
+  )
+head(france_data)
+```
+
+
+### Check the distribution of women's participation
+```{r}
+library(ggplot2)
+
+ggplot(france_data, aes(x = women_participation)) +
+  geom_bar() +
+  labs(
+    title = "Distribution of Women's Participation in French Social Conflicts",
+    x = "Women's participation",
+    y = "Number of events"
+  ) +
+  theme_minimal()
+```
+### write a test for checking the country is France and the year range from 1700 to 1900
+```{r}
+# Simulated dataset matching your actual data
+test_data <- tibble(
+  id = 1:4,
+  country_name = c("France", "France", "Germany", "France"),
+  year = c(1789, 1850, 1800, 1690),
+  women_participation = c("Unknown", "No", "Yes", "Yes")
+)
+
+# Filter France and years 1700–1900
+test_result <- test_data |>
+  filter(country_name == "France", year >= 1700, year <= 1900)
+
+# Test the filter
+stopifnot(nrow(test_result) == 2)
+stopifnot(all(test_result$country_name == "France"))
+stopifnot(all(test_result$year >= 1700 & test_result$year <= 1900))
+
+```
+

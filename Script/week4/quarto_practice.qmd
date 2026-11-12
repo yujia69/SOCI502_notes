@@ -1,0 +1,60 @@
+---
+title: "quarto_practice"
+format: pdf
+author: "Yujia Huang"
+bibliography: bibliography.bib
+abstract: "This is my abstract. I am following @tellingstories, to use @citeR "
+---
+
+```{r}
+#| eval: true
+#| warning: false
+ 
+#install.packages("AER")
+#install.packages("great_tables", repos = "https://cloud.r-project.org")
+library(tidyverse)
+library(AER)
+library(tinytable)
+data("DoctorVisits", package = "AER")
+
+DoctorVisits |>
+  ggplot(aes(x = illness)) +
+  geom_histogram(stat = "count")
+```
+
+```{r}
+#| eval: true
+#| warning: false
+#| label: fig-doctorgraphsidebyside
+#| fig-cap: "Two variants of graphs"
+#| fig-subcap: ["Illnesses","Visits to the doctor"]
+#| layout-ncol: 2
+
+DoctorVisits |>
+  ggplot(aes(x = illness)) +
+  geom_histogram(stat = "count") +
+  theme_minimal()
+
+DoctorVisits |>
+  ggplot(aes(x = visits)) +
+  geom_histogram(stat = "count") +
+  theme_classic()
+```
+
+ 
+ 
+
+$$
+\begin{aligned}
+y_i|\pi_i & \sim \mbox{Bern}(\pi_i) \\
+\mbox{logit}(\pi_i) & = \beta_0+ \alpha_{g[i]}^{\mbox{gender}} + \alpha_{a[i]}^{\mbox{age}} + \alpha_{s[i]}^{\mbox{state}} + \alpha_{e[i]}^{\mbox{edu}} \\
+\beta_0 & \sim \mbox{Normal}(0, 2.5)\\
+\alpha_{g}^{\mbox{gender}} & \sim \mbox{Normal}(0, 2.5)\mbox{ for }g=1, 2\\
+\alpha_{a}^{\mbox{age}} & \sim \mbox{Normal}\left(0, \sigma^2_{\mbox{age}}\right)\mbox{ for }a = 1, 2, \dots, A\\
+\alpha_{s}^{\mbox{state}} & \sim \mbox{Normal}\left(0, \sigma^2_{\mbox{state}}\right)\mbox{ for }s = 1, 2, \dots, S\\
+\alpha_{e}^{\mbox{edu}} & \sim \mbox{Normal}\left(0, \sigma^2_{\mbox{edu}}\right)\mbox{ for }e = 1, 2, \dots, E\\
+\sigma_{\mbox{gender}} & \sim \mbox{Exponential}(1)\\
+\sigma_{\mbox{state}} & \sim \mbox{Exponential}(1)\\
+\sigma_{\mbox{edu}} & \sim \mbox{Exponential}(1)
+\end{aligned}
+$$

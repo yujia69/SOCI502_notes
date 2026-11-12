@@ -1,0 +1,92 @@
+---
+title: "Do bangs('!') get more clicks?"
+format: pdf
+author: Yujia Huang
+---
+
+## Introduction
+We want to answer the question: Are there differences in average clicks between headlines that use a "!" and headlines that do not contain a "!".
+
+```{r}
+#tinytex::tlmgr_install("tabularray")
+```
+
+
+```{r}
+#install.packages("labelled") 
+#install.packages("tinytable") 
+
+library(haven)
+library(labelled)
+library(tidyverse)
+library(tinytable)
+```
+
+```{r}
+upworthy <- read_csv("https://osf.io/vy8mj/download")
+```
+
+```{r}
+upworthy |>
+  names()
+```
+
+#### Select variables that we need
+
+-   “created_at”;
+-   “clickability_test_id”, so that we can create comparison groups;
+-   “headline”;
+-   “impressions”, which is the number of people that saw the package; and
+-   “clicks” which is the number of clicks on that package.
+
+```{r}
+upworthy_restricted <-
+  upworthy |>
+  select(
+    created_at, clickability_test_id, headline, impressions, clicks
+    )
+head(upworthy_restricted)
+```
+
+We will focus on the text contained in headlines, and look at whether headlines contains "!" got more clicks than those that did not. We want to remove the effect of different images and so will focus on those tests that have the same image. To identify whether a headline contains a "!", we search for "!".
+
+```{r}
+upworthy_restricted <-
+  upworthy_restricted |>
+  mutate(
+    suprised =
+      str_detect(string = headline, pattern = "\\!")
+    )
+
+upworthy_restricted |>
+  count(suprised)
+```
+
+For every test, and for every picture, we want to know whether "!" affected the number of clicks.
+
+```{r}
+supprised_or_not <-
+  upworthy_restricted |>
+  summarise(
+    ave_clicks = mean(clicks),
+    .by = c(clickability_test_id, suprised)
+  ) 
+
+supprised_or_not |>
+  pivot_wider(names_from = suprised,
+              values_from = ave_clicks,
+              names_prefix = "ave_clicks_") |>
+  drop_na(ave_clicks_FALSE, ave_clicks_TRUE) |>
+  mutate(difference_in_clicks = ave_clicks_TRUE - ave_clicks_FALSE) |> 
+  summarise(average_differce = mean(difference_in_clicks))
+```
+
+```{r}
+supprised_or_not |> 
+  summarise(mean = mean(ave_clicks),
+            .by = suprised) |> 
+  tt() |> 
+  style_tt(j = 1:2, align = "lr") |> 
+  format_tt(digits = 0, num_fmt = "decimal") |> 
+  setNames(c("contains a '!' ?", "Mean clicks"))
+```

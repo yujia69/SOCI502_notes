@@ -1,0 +1,126 @@
+---
+title: "Percentage of Dwelling that is occupied by usual residant"
+author: "Yujia Huang"
+date: "Oct 6, 2026"
+format: pdf
+echo: False
+warning: false
+---
+
+```{r}
+#install.packages("devtools")
+#devtools::install_github("ttimbers/canlang")
+
+library(cancensus)
+library(canlang)
+library(maps)
+library(tidycensus)
+library(tidyverse)
+library(tinytable)
+```
+
+# Introduction
+
+I used the 2021 Canadian Census data on Total private dwellings to study the percentage of dwellings that is occupied by usual residents in regions in British Columbia.
+
+#### Load API
+
+```{r}
+cancensus::set_cancensus_api_key(
+  "CensusMapper_70e5361cbe57fe20421ca86cd517e369",
+  install = TRUE,
+  overwrite=TRUE
+)
+
+grep("api", ls("package:cancensus"), value = TRUE)
+
+```
+
+```{r}
+cancensus::set_cancensus_api_key(
+  "CensusMapper_70e5361cbe57fe20421ca86cd517e369",
+  install = TRUE,
+  overwrite=TRUE
+)
+```
+
+
+
+#### Learning to use Canadian Census data
+
+```{r}
+list_census_datasets()
+
+```
+
+Learn about 2021 Canada Census
+
+```         
+```
+
+```{r}
+list_census_vectors(dataset = "CA21")
+```
+
+```{r}
+list_census_regions("CA21")
+```
+
+```{r}
+c_26 <-
+  get_census(
+    dataset = "CA21",
+    level = "CMA",
+    vectors = "v_CA21_5",
+    regions = list(PR = c("59"))
+  )
+
+c_26
+```
+
+```{r}
+colnames(c_26)
+```
+
+#### Calculate the Percentage
+
+The table show the top 15 regions with the least percentage of dwelling that is occupied by usual residents.
+
+```{r}
+c_26 <- c_26 |>
+  mutate(
+    percentage_occupied = round(
+      `v_CA21_5: Private dwellings occupied by usual residents` /
+      Dwellings * 100,
+      2
+    )
+  )
+
+c_26 |>
+  select(`Region Name`, percentage_occupied) |>
+  arrange(percentage_occupied) |>
+  slice_head(n = 15)
+
+```
+
+```{r}
+ggplot(c_26, aes(
+  x = reorder(`Region Name`, percentage_occupied),
+  y = percentage_occupied
+)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    x = "Region",
+    y = "Percentage",
+    title = "Percentage of Dwellings Occupied by Usual Residents"
+  ) +
+  theme(
+    plot.title = element_text(size = 7)
+  )
+```
+
+### Conclusion
+
+The graph shows that Prince Rupert, Dawson Creek and Fort St. John have the least percentage of dwellings that are occupied by usual residents. And in most of the British Columbia, over 90% of dwellings are occupied by the usual resident.
+

@@ -1,0 +1,21 @@
+---
+title: "Milestone Practice"
+format: html
+---
+
+## 1. Plan, draw a graph, determine what is the data frame going to look like
+
+## 2. Simulation
+
+```{r}
+set.seed(123)
+```
+
+
+## 3. pull census data
+
+
+```{r}
+list_census_regions(dataset = "")
+```
+

@@ -2,7 +2,8 @@
 title: "Exploring australian elections" 
 author: "Yujia Huang" 
 date: 2026-9-21 
-format: html
+format: pdf
+bibliography: bibliography.bib
 ---
 
 ### This is a in-class practice for Quarto files
@@ -19,6 +20,9 @@ format: html
 ```
 
 ```{r}
+#| echo: false
+#| warning: false
+#| message: false
 #### Workspace setup ####
 #install.packages("tidyverse")
 #install.packages("janitor")
@@ -30,6 +34,9 @@ library(janitor)
 ## Stimulate data
 
 ```{r}
+#| echo: false
+#| warning: false
+#| message: false
 simulated_data <-
   tibble(
     # Use 1 through to 151 to represent each division

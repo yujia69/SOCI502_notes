@@ -1,0 +1,134 @@
+---
+title: "Week6_practice_arXiv"
+format: pdf
+author: Yujia Huang
+bibliography: bibliography.bib
+---
+
+In this case study, I use the API provided by arXiv to retrieve research paper metadata [@arxiv_api]. I used the arXiv API to retrieve up to 500 research papers matching the exact phrase "climate change" through the all search field. 
+
+```{r}
+#install.packages("httr")  # Run only once
+library(httr)
+library(xml2)
+library(tidyverse)
+```
+
+ 
+
+
+```{r}
+arxiv <- GET("http://export.arxiv.org/api/query?search_query=all:climate%20change")
+
+status_code(arxiv)
+```
+
+```{r}
+content(arxiv) |>
+  read_xml() |>
+  html_structure()
+```
+```{r}
+content(arxiv) |>
+  read_xml()
+```
+
+```{r}
+content(arxiv) |>
+  read_xml() |>
+  xml_child(search = 8)|>
+  xml_child(search = 2)
+```
+
+```{r}
+content(arxiv) |>
+  read_xml() |>
+  xml_child(search = 8)|>
+  xml_child(search = 2) |>
+  xml_text()
+```
+
+```{r}
+xml_data <- read_xml(arxiv)
+xml_ns_strip(xml_data)
+titles <- xml_text(xml_find_all(xml_data, ".//title"))
+titles
+```
+
+```{r}
+dates <- xml_text(xml_find_all(xml_data, ".//published"))
+dates
+```
+
+```{r}
+df <- data.frame(titles = titles[-1], dates = dates)
+df
+```
+
+```{r}
+library(httr2)
+library(xml2)
+library(tidyverse)
+
+# --- Configuration ---
+query_term    <- 'all:"climate change"'  # Change to your target search query
+batch_size    <- 100            # Max allowed per request by arXiv is 30,000
+total_results <- 500            # Total number of papers you want to fetch
+base_url      <- "http://export.arxiv.org/api/query"
+
+# Empty list container to store tibbles from each batch iteration
+all_batches <- list()
+
+# --- Loop Through Results ---
+for (start_idx in seq(0, total_results - 1, by = batch_size)) {
+  
+  message(sprintf("Fetching results %d to %d...", start_idx, start_idx + batch_size - 1))
+  
+  # 1. Build and execute the API request
+  req <- request(base_url) %>% 
+    req_url_query(
+      search_query = query_term,
+      start = start_idx,
+      max_results = batch_size
+    )
+  
+  resp <- req_perform(req)
+  xml_content <- resp_body_xml(resp)
+  
+  # 2. Extract elements using XML namespaces (arXiv uses the Atom 1.0 standard)
+  # Strip namespaces to make standard XPath selectors easier
+  xml_ns_strip(xml_content)
+  
+  entries <- xml_find_all(xml_content, ".//entry")
+  
+  # Break loop early if the API returns no more records
+  if (length(entries) == 0) {
+    message("No more entries found. Ending loop.")
+    break
+  }
+  
+  # 3. Parse Title and Publication Date from the current batch
+  titles       <- xml_text(xml_find_all(entries, "./title"))
+  pub_dates    <- xml_text(xml_find_all(entries, "./published"))
+  
+  # Clean up formatting strings (removes line breaks/extra spaces from titles)
+  titles       <- str_squish(titles)
+  pub_dates    <- as.Date(pub_dates) # Converts "2026-10-12T14:00:00Z" to date class
+  
+  # 4. Save current batch into our list container
+  all_batches[[length(all_batches) + 1]] <- tibble(
+    title = titles,
+    publication_date = pub_dates
+  )
+  
+  # 5. Respect the API Rules: arXiv requires a 3-second delay between calls
+  Sys.sleep(3)
+}
+
+# --- Combine Into One Large Tibble ---
+big_arxiv_tibble <- bind_rows(all_batches)
+
+# View the final dataset
+print(big_arxiv_tibble)
+```
+
