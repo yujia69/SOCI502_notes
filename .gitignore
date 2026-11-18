@@ -3,3 +3,18 @@
 .RData
 .Ruserdata
 .DS_Store
+
+# Quarto rendered outputs
+*.html
+*.pdf
+
+# Quarto supporting files (figures, libraries, etc.)
+*_files/
+
+# R-generated files
+.Rhistory
+.RData
+.Rproj.user/
+
+# macOS system files
+.DS_Store
