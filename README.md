@@ -2,8 +2,8 @@
 This repo includes Yujia's SOCI 502 assignments and milestones
 
 Notes for Dr. Laura: 
-Milestone one is in the Data_story file: Data_story/Milestone2_YujiaH.qmd
-The 11-3 assignment is in the Data_story folder since it used the same data
+- Milestone2 is in the Data_story file: Data_story/Milestone2_YujiaH.qmd
+- 11-3 assignment is in the Data_story folder since it used the same data
 
 ##### Project Structure
 
