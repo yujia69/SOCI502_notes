@@ -1,6 +1,7 @@
 ---
 title: "Milestone2_YujiaH"
 format: html
+author: Yujia Huang
 ---
 ```{r}
 #### Workspace setup ####
