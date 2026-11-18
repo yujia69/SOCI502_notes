@@ -63,6 +63,8 @@ ggplot(france_data, aes(x = women_participation)) +
   ) +
   theme_minimal()
 ```
+ 
+ 
 ### write a test for checking the country is France and the year range from 1700 to 1900
 ```{r}
 # Simulated dataset matching your actual data

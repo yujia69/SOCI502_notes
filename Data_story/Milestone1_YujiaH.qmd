@@ -45,5 +45,3 @@ head(social_conflict)
 
 ## Potential Pattern as an Answer
 There is an increase in proportion of social conflicts involving women in France between the 18th and 19th centuries on average.
-
-

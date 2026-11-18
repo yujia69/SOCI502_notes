@@ -1,0 +1,198 @@
+---
+title: "Milestone2_YujiaH"
+format: html
+---
+```{r}
+#### Workspace setup ####
+# install.packages("tidyverse")
+# install.packages("janitor")
+
+library(tidyverse)
+library(janitor)
+```
+
+### Background
+In milestone one, I identified the research question: How did the percentage of social conflicts involving women in France change between the 18th and 19th centuries? And I simulated data with three variables: Event ID, Year, and Women’s Participation, to potentially answer the question.
+```{r}
+# Set seed for reproducibility
+set.seed(123)
+
+# Simulate 500 rows of data
+social_conflict <- tibble(
+  "Event_ID" = 1:500,
+  "Year" = sample(1700:1900, size = 500, replace = TRUE),
+  "Women_Participation" = sample(
+    c(0, 1),
+    size = 500,
+    replace = TRUE,
+    prob = c(0.7, 0.3)
+  )
+)
+
+# View the first 6 rows
+head(social_conflict)
+```
+
+
+##Milestoe 2
+In this milestone, I will clean the raw data from Historical Social Conflict Database (HiSCoD) and conduct exploratory data analysis.
+
+### 1. Importing raw data
+```{r}
+
+data_raw <- read.csv(
+  "data/db_hiscod_csv_v1_en.csv",
+  sep = ";",
+  header = TRUE
+)
+
+```
+#### Make a copy of the data
+```{r}
+data_copy <- data_raw |>
+  separate_wider_delim(
+    cols = 1,
+    delim = ";",
+    names = strsplit(names(data_raw)[1], ";")[[1]]
+  )
+```
+
+#### Take a look of the data
+```{r}
+head(data_copy)
+colnames(data_copy)
+```
+### 2. Cleaning the data
+#### Filters the original dataset to include only social conflict events recorded in France between 1700 and 1900 
+```{r}
+france_data <- data_copy |>
+  filter(
+    country_name == "France", #filtering country to be France
+    year >= 1700,
+    year <= 1900 #filtering year to be between 1700 to 1900
+  ) |>
+  select(id, year, women_participation) #selecting the three columns needed for the question
+
+head(france_data)
+```
+```{r}
+# check what are the values under the women_participation column.
+unique(france_data$women_participation)
+```
+
+### 3. Checking the cleaned data
+
+```{r}
+# Check that all observations are between 1700 to 1900
+stopifnot(
+  all(france_data$year >= 1700 &
+      france_data$year <= 1900,
+      na.rm = TRUE)
+)
+```
+
+```{r}
+# Check that the cleaned data retained exactly the three columns you wanted
+ stopifnot(
+  all(names(france_data) %in%
+        c("id", "year", "women_participation")),
+  ncol(france_data) == 3
+)
+```
+
+```{r}
+#Check only France data is selected
+stopifnot(
+  all(
+    data_copy |>
+      filter(year >= 1700, year <= 1900) |>
+      filter(country_name == "France") |>
+      pull(country_name) == "France"
+  )
+)
+```
+
+```{r}
+# Check the event id is unique
+stopifnot(
+  !anyDuplicated(france_data$id)
+)
+```
+
+### 4.Exploratory data analysis
+#### Graph 1: Distribution of women's participation
+```{r}
+france_data |>
+  ggplot(aes(x = women_participation)) +
+  geom_bar() +
+  labs(
+    title = "Graph 1: Distribution of Women's Participation",
+    x = "Women's Participation",
+    y = "Number of Events"
+  ) +
+  theme_minimal()
+```
+This shows that women's participation is unknown for more than a third of the social conflict data.
+
+#### Graph 2: Number of social conflicts by years
+```{r}
+library(ggplot2)
+
+ggplot(france_data, aes(x = year)) +
+  geom_bar() +
+  labs(
+    title = "Graph 2: Distribution of the variables Year",
+    x = "Year",
+    y = "Number of events"
+  ) +
+  theme_minimal()
+```
+Graph 2 shows that there is no to a few social conflict documented between 1790 and 1800, as well as after 1860.
+
+#### Graph 3: Number of Social Conflicts by Women's Participation
+```{r}
+france_data <- france_data |>
+  mutate(decade = floor(year / 10) * 10)
+
+france_data |>
+  ggplot(aes(x = decade, fill = women_participation)) +
+  geom_bar(position = "stack") +
+  labs(
+    title = " Graph 3: Number of Social Conflicts by Women's Participation",
+    x = "Decade",
+    y = "Number of Events",
+    fill = "Women's Participation"
+  ) +
+  theme_minimal()
+```
+
+The graph shows a substantial concentration of recorded social conflicts between 1780 and 1800. However, women's participation in most of these events is classified as "Unknown," indicating a lack of documented information about women's involvement during this period.
+
+#### Graph 4: Percentage of Conflicts Involving Women by Decade (filtering out unknow data for women's participation)
+```{r}
+france_data <- france_data |>
+  mutate(decade = floor(year / 10) * 10)
+
+france_data |>
+  filter(women_participation %in% c("Yes", "No")) |>
+  group_by(decade) |>
+  summarise(
+    percentage_women = mean(women_participation == "Yes") * 100,
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = decade, y = percentage_women)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Graph 4: Percentage of Conflicts Involving Women by Decade",
+    x = "Decade",
+    y = "Percentage (%)"
+  ) +
+  theme_minimal()
+```
+
+
+The graph suggests that the proportion of recorded conflicts involving women peaked around 1790. However, this pattern should be interpreted with caution, as a large number of events during this period have undocumented women's participation. As shown in Graph 3, the actual number of events with documented women's participation was relatively low between 1790 and 1800.
+
+### 5. Note
+What surprised me most was the lack of historical documentation regarding women's participation in social conflicts, which significantly limits the ability to examine trends in women's involvement over time. This also raised another question for me: why has women's participation been so poorly documented? One possible explanation is the historical marginalization of women in political and public life, where men were more commonly recognized as legitimate political actors and citizens. For example, French women were not granted the right to vote until 1944, much later than men. This historical gender inequality may also have influenced whose participation was considered worth recording in historical accounts. Consequently, the historical records of social conflicts may disproportionately represent men's experiences, making women's involvement less visible in the dataset.
